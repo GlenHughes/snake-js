@@ -1,3 +1,10 @@
 #game-canvas {
     background: #000;
 }
+#game-score {
+    position: absolute;
+    top: 17px;
+    left: 20px;
+    color: #fff;
+    font-size: 20px;
+}

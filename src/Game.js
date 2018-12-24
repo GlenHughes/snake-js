@@ -12,6 +12,7 @@ export default class SnakeJS {
         this.snakeHeight = 10;
         this.snake = [];
         this.canvas = new Canvas(this.snakeWidth, this.snakeHeight);
+        this.score = 0;
 
         // set default direction
         this.direction = 'right';
@@ -31,20 +32,26 @@ export default class SnakeJS {
             })
         }
 
+        this.food = this.foodPosition();
+
         setInterval(this.draw.bind(this), 60);
     }
 
     draw() {
         this.canvas.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+        
+
         this.snake.forEach((position, index) => {
             const { x, y } = position;
             this.drawSnake(x, y);
         });
-        
+
+        this.drawFood(this.food.x, this.food.y);
+
         // current snake head
         let { x, y } = this.snake[0];
-        this.snake.pop();
+
         if (this.direction === 'left') {
             x--;
         } else if (this.direction === 'up') {
@@ -55,10 +62,39 @@ export default class SnakeJS {
             y++;
         }
 
+        // hit the wall
+        if (x < 0 || y < 0 || x >= this.canvas.width / this.snakeWidth || y >= this.canvas.height / this.snakeHeight || this.checkCollision(x, y)) {
+            // end game, show score and get ready to start again
+            // this.snake = [{
+            //     x: 1,
+            //     y: 1,
+            // }];
+            this.scorePoiht(true);
+            console.log('Game over');
+            // window.location.reload();ß
+        }
+
+        // eats the food
+        if (x === this.food.x && y === this.food.y) {
+            this.food = this.foodPosition();
+            this.scorePoiht(1);
+        } else {
+            this.snake.pop();
+        }
+
         this.snake.unshift({
             x,
             y,
         });
+    }
+
+    checkCollision(x, y) {
+        for (let i = 0; i < this.snake.length; i++) {
+            if (x === this.snake[i].x && y === this.snake[i].y) {
+                return true;
+            }
+        }
+        return false;
     }
 
     drawSnake(x, y) {
@@ -76,7 +112,29 @@ export default class SnakeJS {
             this.snakeWidth,
             this.snakeHeight
         );
+    }
 
+    drawFood(x, y) {
+        this.canvas.context.fillStyle = 'yellow';
+        this.canvas.context.fillRect(
+            x * this.snakeWidth, 
+            y * this.snakeHeight, 
+            this.snakeWidth, 
+            this.snakeHeight
+        );
+        this.canvas.context.fillStyle = '#000';
+        this.canvas.context.strokeRect(
+            x * this.snakeWidth, 
+            y * this.snakeHeight, 
+            this.snakeWidth,
+            this.snakeHeight
+        );
+    }
+
+    scorePoiht(reset) {
+        this.score = reset === true ? 0 : this.score + 1;
+        
+        document.getElementById('game-score').textContent = this.score;
     }
 
     setDirection(keyCode) {
@@ -100,8 +158,15 @@ export default class SnakeJS {
                 if (this.direction !== 'up') {
                     this.direction = 'down';
                 }
-                break;   
+             break;   
         }  
+    }
+
+    foodPosition() {
+        return {
+            x: Math.round(Math.random() * (this.canvas.width / this.snakeWidth - 1) + 1),
+            y: Math.round(Math.random() * (this.canvas.height / this.snakeHeight - 1) + 1),
+        }
     }
 }
 
