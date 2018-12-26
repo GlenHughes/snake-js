@@ -1,12 +1,18 @@
 export default class Snake {
-    constructor() {
+    constructor(snakeColour, outlineColour, snakeWidth, snakeHeight) {
+        this.snakeColour = snakeColour;
+        this.outlineColour = outlineColour;
         this.squares = [];
-        this.width = 10;
-        this.height = 10;
+        this.width = snakeWidth;
+        this.height = snakeHeight;
         this.position = {
             x: 1,
             y: 1,
         }
+    }
+
+    init(canvas) {
+        this.canvas = canvas;
     }
 
     getSquares() {
@@ -83,5 +89,25 @@ export default class Snake {
         }
 
         return newHeadLocation;
+    }
+
+    draw(x, y) {
+        // draw square
+        this.canvas.context.fillStyle = this.snakeColour
+        this.canvas.context.fillRect(
+            x * this.width, 
+            y * this.height, 
+            this.width, 
+            this.height
+        );
+
+        // draw outline
+        this.canvas.context.fillStyle = this.outlineColour;
+        this.canvas.context.strokeRect(
+            x * this.width, 
+            y * this.height, 
+            this.width,
+            this.height
+        );
     }
 }

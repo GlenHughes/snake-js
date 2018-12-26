@@ -7,16 +7,27 @@ import './assets/css/game-styles.css';
 
 const defaultConfig = {
     gameSpeed: 60, // snake speed in milliseconds
+    container: 'game-container',
+    gameOver: '#game-over',
+    snakeColour: '#fff',
+    snakeWidth: 10,
+    snakeHeight: 10,
+    outlineColour: '#000',
 }
 
 export default class SnakeJS {
     constructor(config) {
         console.log('snake game has been loaded');
         this.setConfig(config);
-        this.container = document.getElementById('game-container');
-        this.gameOverContainer = this.container.querySelector('#game-over');
+        this.container = document.getElementById(this.config.container);
+        this.gameOverEl = this.container.querySelector(this.config.gameOver);
         this.score = new Score();
-        this.snake = new Snake();
+        this.snake = new Snake(
+            this.config.snakeColour, 
+            this.config.outlineColour,
+            this.config.snakeWidth,
+            this.config.snakeHeight,
+        );
         this.canvas = new Canvas(
             400,
             400,
@@ -24,6 +35,7 @@ export default class SnakeJS {
             this.snake.height
         );
         this.food = new Food(this.canvas, this.snake);
+        this.snake.init(this.canvas);
         this.startGame();
 
         // allow user to change direction with keys
@@ -32,7 +44,7 @@ export default class SnakeJS {
         });
 
         // allow restart of game
-        this.gameOverContainer.querySelector('button').addEventListener('click', event => {
+        this.gameOverEl.querySelector('button').addEventListener('click', event => {
             this.startGame();
         });
 
@@ -41,8 +53,6 @@ export default class SnakeJS {
                 this.draw();
             }
         }, this.config.gameSpeed);
-
-        // this.container.focus();
     }
 
     setConfig(config) {
@@ -55,9 +65,9 @@ export default class SnakeJS {
     draw() {
         this.canvas.clear();
 
-        this.snake.getSquares().forEach((position, index) => {
+        this.snake.getSquares().forEach(position => {
             const { x, y } = position;
-            this.drawSnake(x, y);
+            this.snake.draw(x, y);
         });
 
         this.food.draw();
@@ -117,23 +127,6 @@ export default class SnakeJS {
         return false;
     }
 
-    drawSnake(x, y) {
-        this.canvas.context.fillStyle = '#fff';
-        this.canvas.context.fillRect(
-            x * this.snake.width, 
-            y * this.snake.height, 
-            this.snake.width, 
-            this.snake.height
-        );
-        this.canvas.context.fillStyle = '#000';
-        this.canvas.context.strokeRect(
-            x * this.snake.width, 
-            y * this.snake.height, 
-            this.snake.width,
-            this.snake.height
-        );
-    }
-
     startGame() {
         console.log('Start game');
         this.running = true;
@@ -143,16 +136,16 @@ export default class SnakeJS {
         this.direction = 'right';
         this.snake.rebuild();
         this.food.position();
-        this.gameOverContainer.style.display = 'none';
+        this.gameOverEl.style.display = 'none';
     }
 
     gameOver() {
         console.log('Game over!');
         this.running = false;
         this.frames = 0;
-        this.gameOverContainer.querySelector('span').textContent = this.score.getScore();
+        this.gameOverEl.querySelector('span').textContent = this.score.getScore();
         this.score.setScore(0);
-        this.gameOverContainer.style.display = 'block';
+        this.gameOverEl.style.display = 'block';
     }
 
     setDirection(keyCode) {
