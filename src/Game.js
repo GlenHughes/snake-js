@@ -20,25 +20,17 @@ export default class SnakeJS {
             this.snakeHeight
         );
         this.startGame();
-        // set default direction
-        this.direction = 'right';
+
         // allow user to change direction with keys
         document.addEventListener('keydown', event => {
             this.setDirection(event.keyCode);
         });
+        // allow restart of game
+        this.gameOverContainer.querySelector('button').addEventListener('click', event => {
+            this.startGame();
+        });
         // this.score = new Score(container);
         // this.snake = new Snake(container);
-
-        const length = 5;
-
-        for (let i = 0; i < length - 1; i++) {
-            this.snake.push({
-                x: i,
-                y: 0,
-            })
-        }
-
-        this.food = this.foodPosition();
 
         setInterval(() => {
             if (this.running) {
@@ -184,6 +176,17 @@ export default class SnakeJS {
         this.running = true;
         this.frames = 0;
         this.setScore(0);
+        this.snake = [];
+        this.direction = 'right';
+        const snakeLength = 7;
+        for (let i = 0; i < snakeLength - 1; i++) {
+            this.snake.push({
+                x: i,
+                y: 0,
+            })
+        }
+
+        this.food = this.foodPosition();
         this.gameOverContainer.style.display = 'none';
     }
 
