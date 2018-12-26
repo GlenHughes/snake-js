@@ -1,9 +1,9 @@
 export default class Canvas {
-    constructor(snakeWidth, snakeHeight) {
+    constructor(canvasWidth, canvasHeight, snakeWidth, snakeHeight) {
         this.element = document.getElementById('game-canvas');
+        this.element.width = this.width = canvasWidth;
+        this.element.height = this.height = canvasHeight;
         this.context = this.element.getContext('2d');
-        this.width = this.element.width;
-        this.height = this.element.height;
         this.snakeWidth = snakeWidth;
         this.snakeHeight = snakeHeight;
     }

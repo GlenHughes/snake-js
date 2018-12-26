@@ -11,7 +11,12 @@ export default class SnakeJS {
         this.snakeWidth = 10;
         this.snakeHeight = 10;
         this.snake = [];
-        this.canvas = new Canvas(this.snakeWidth, this.snakeHeight);
+        this.canvas = new Canvas(
+            400,
+            400,
+            this.snakeWidth, 
+            this.snakeHeight
+        );
         this.score = 0;
 
         // set default direction
@@ -40,8 +45,6 @@ export default class SnakeJS {
     draw() {
         this.canvas.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        
-
         this.snake.forEach((position, index) => {
             const { x, y } = position;
             this.drawSnake(x, y);
@@ -63,15 +66,16 @@ export default class SnakeJS {
         }
 
         // hit the wall
-        if (x < 0 || y < 0 || x >= this.canvas.width / this.snakeWidth || y >= this.canvas.height / this.snakeHeight || this.checkCollision(x, y)) {
-            // end game, show score and get ready to start again
-            // this.snake = [{
-            //     x: 1,
-            //     y: 1,
-            // }];
+        if (x < 0 || y < 0 || x >= this.canvas.width / this.snakeWidth || y >= this.canvas.height / this.snakeHeight) {
+            const newHeadPosition = this.flipHead(x, y);
+            x = newHeadPosition.x;
+            y = newHeadPosition.y;
+        }
+
+        // hit self
+        if (this.checkCollision(x, y)) {
             this.scorePoiht(true);
             console.log('Game over');
-            // window.location.reload();ß
         }
 
         // eats the food
@@ -86,6 +90,36 @@ export default class SnakeJS {
             x,
             y,
         });
+    }
+
+    flipHead(x, y) {
+        const realX = x > 0 ? x * 10 : 0;
+        const realY = y > 0 ? y * 10 : 0;
+        let newHeadLocation;
+        
+        if (realX >= this.canvas.width) {
+            newHeadLocation = {
+                x: 0,
+                y,
+            }
+        } else if(realX <= 0) {
+            newHeadLocation = {
+                x: this.canvas.width / this.snakeWidth,
+                y,
+            }
+        } else if (realY >= this.canvas.height) {
+            newHeadLocation = {
+                x,
+                y: 0,
+            }
+        } else if (realY <= 0) {
+            newHeadLocation = {
+                x,
+                y: this.canvas.height / this.snakeHeight,
+            }
+        }
+
+        return newHeadLocation;
     }
 
     checkCollision(x, y) {
@@ -164,8 +198,8 @@ export default class SnakeJS {
 
     foodPosition() {
         return {
-            x: Math.round(Math.random() * (this.canvas.width / this.snakeWidth - 1) + 1),
-            y: Math.round(Math.random() * (this.canvas.height / this.snakeHeight - 1) + 1),
+            x: Math.round(Math.random() * (this.canvas.width / this.snakeWidth - 1)),
+            y: Math.round(Math.random() * (this.canvas.height / this.snakeHeight - 1)),
         }
     }
 }
