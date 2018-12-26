@@ -7,4 +7,8 @@ export default class Canvas {
         this.snakeWidth = snakeWidth;
         this.snakeHeight = snakeHeight;
     }
+
+    clear() {
+        this.context.clearRect(0, 0, this.element.width, this.element.height);
+    }
 }

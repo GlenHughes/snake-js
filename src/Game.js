@@ -1,76 +1,92 @@
 import Canvas from './assets/js/Canvas';
 import Score from './assets/js/Score';
 import Snake from './assets/js/Snake';
+import Food from './assets/js/Food';
 
 import './assets/css/game-styles.css';
 
+const defaultConfig = {
+    gameSpeed: 60, // snake speed in milliseconds
+}
+
 export default class SnakeJS {
-    constructor() {
+    constructor(config) {
         console.log('snake game has been loaded');
+        this.setConfig(config);
         this.container = document.getElementById('game-container');
         this.gameOverContainer = this.container.querySelector('#game-over');
-        this.gameScoreContainer = this.container.querySelector('#game-score');
-        this.snakeWidth = 10;
-        this.snakeHeight = 10;
-        this.snake = [];
+        this.score = new Score();
+        this.snake = new Snake();
         this.canvas = new Canvas(
             400,
             400,
-            this.snakeWidth, 
-            this.snakeHeight
+            this.snake.width, 
+            this.snake.height
         );
+        this.food = new Food(this.canvas, this.snake);
         this.startGame();
 
         // allow user to change direction with keys
         document.addEventListener('keydown', event => {
             this.setDirection(event.keyCode);
         });
+
         // allow restart of game
         this.gameOverContainer.querySelector('button').addEventListener('click', event => {
             this.startGame();
         });
-        // this.score = new Score(container);
-        // this.snake = new Snake(container);
 
         setInterval(() => {
             if (this.running) {
                 this.draw();
             }
-        }, 60);
+        }, this.config.gameSpeed);
+
+        // this.container.focus();
+    }
+
+    setConfig(config) {
+        if (!config) {
+            return this.config = defaultConfig;
+        }
+        this.config = { defaultConfig, ...config };
     }
 
     draw() {
-        this.canvas.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.canvas.clear();
 
-        this.snake.forEach((position, index) => {
+        this.snake.getSquares().forEach((position, index) => {
             const { x, y } = position;
             this.drawSnake(x, y);
         });
 
-        this.drawFood(this.food.x, this.food.y);
+        this.food.draw();
 
         // current snake head
-        let { x, y } = this.snake[0];
-
+        let { x, y } = this.snake.getHead();
+            
         if (this.direction === 'left') {
             x--;
         } else if (this.direction === 'up') {
             y--;
-        } else if (this.direction === 'right') {
+        } else if (this.direction === 'right') {                    
             x++;
         } else if (this.direction === 'down') {
             y++;
         }
 
         // hit the wall
-        if (x < 0 || y < 0 || x >= this.canvas.width / this.snakeWidth || y >= this.canvas.height / this.snakeHeight) {
-            const newHeadPosition = this.flipHead(x, y);
+        if (x < 0 || 
+            y < 0 || 
+            x >= this.canvas.width / this.snake.width || 
+            y >= this.canvas.height / this.snake.width) {
+            const newHeadPosition = this.snake.flipHead(x, y, this.canvas.width, this.canvas.height);
             x = newHeadPosition.x;
             y = newHeadPosition.y;
         }
 
         // hit self
-        if (this.frames > this.snake.length) {
+        if (this.frames > this.snake.getLength()) {
             if (this.checkCollision(x, y)) {
                 this.gameOver();
             }
@@ -78,54 +94,23 @@ export default class SnakeJS {
 
         // eats the food
         if (x === this.food.x && y === this.food.y) {
-            this.food = this.foodPosition();
-            this.setScore();
+            this.food.position();
+            this.food.draw();
+            this.score.setScore();
         } else {
-            this.snake.pop();
+            this.snake.removeTail();
         }
 
-        // set snake to next location
-        this.snake.unshift({
-            x,
-            y,
-        });
+        this.snake.forward(x, y);
 
         this.frames++;
     }
 
-    flipHead(x, y) {
-        const realX = x > 0 ? x * 10 : 0;
-        const realY = y > 0 ? y * 10 : 0;
-        let newHeadLocation;
-        
-        if (realX >= this.canvas.width) {
-            newHeadLocation = {
-                x: 0,
-                y,
-            }
-        } else if(realX <= 0) {
-            newHeadLocation = {
-                x: this.canvas.width / this.snakeWidth,
-                y,
-            }
-        } else if (realY >= this.canvas.height) {
-            newHeadLocation = {
-                x,
-                y: 0,
-            }
-        } else if (realY <= 0) {
-            newHeadLocation = {
-                x,
-                y: this.canvas.height / this.snakeHeight,
-            }
-        }
-
-        return newHeadLocation;
-    }
+    
 
     checkCollision(x, y) {
-        for (let i = 0; i < this.snake.length; i++) {
-            if (x === this.snake[i].x && y === this.snake[i].y) {
+        for (let i = 0; i < this.snake.getLength(); i++) {
+            if (x === this.snake.getSquares()[i].x && y === this.snake.getSquares()[i].y) {
                 return true;
             }
         }
@@ -135,58 +120,29 @@ export default class SnakeJS {
     drawSnake(x, y) {
         this.canvas.context.fillStyle = '#fff';
         this.canvas.context.fillRect(
-            x * this.snakeWidth, 
-            y * this.snakeHeight, 
-            this.snakeWidth, 
-            this.snakeHeight
+            x * this.snake.width, 
+            y * this.snake.height, 
+            this.snake.width, 
+            this.snake.height
         );
         this.canvas.context.fillStyle = '#000';
         this.canvas.context.strokeRect(
-            x * this.snakeWidth, 
-            y * this.snakeHeight, 
-            this.snakeWidth,
-            this.snakeHeight
+            x * this.snake.width, 
+            y * this.snake.height, 
+            this.snake.width,
+            this.snake.height
         );
-    }
-
-    drawFood(x, y) {
-        this.canvas.context.fillStyle = 'yellow';
-        this.canvas.context.fillRect(
-            x * this.snakeWidth, 
-            y * this.snakeHeight, 
-            this.snakeWidth, 
-            this.snakeHeight
-        );
-        this.canvas.context.fillStyle = '#000';
-        this.canvas.context.strokeRect(
-            x * this.snakeWidth, 
-            y * this.snakeHeight, 
-            this.snakeWidth,
-            this.snakeHeight
-        );
-    }
-
-    setScore(point) {
-        this.score = point === 0 ? 0 : this.score + 1;
-        this.gameScoreContainer.textContent = this.score;
     }
 
     startGame() {
         console.log('Start game');
         this.running = true;
         this.frames = 0;
-        this.setScore(0);
-        this.snake = [];
+        this.score.setScore(0);
+        this.snake.reset();
         this.direction = 'right';
-        const snakeLength = 7;
-        for (let i = 0; i < snakeLength - 1; i++) {
-            this.snake.push({
-                x: i,
-                y: 0,
-            })
-        }
-
-        this.food = this.foodPosition();
+        this.snake.rebuild();
+        this.food.position();
         this.gameOverContainer.style.display = 'none';
     }
 
@@ -194,8 +150,8 @@ export default class SnakeJS {
         console.log('Game over!');
         this.running = false;
         this.frames = 0;
-        this.gameOverContainer.querySelector('span').textContent = this.score;
-        this.setScore(0);
+        this.gameOverContainer.querySelector('span').textContent = this.score.getScore();
+        this.score.setScore(0);
         this.gameOverContainer.style.display = 'block';
     }
 
@@ -221,13 +177,6 @@ export default class SnakeJS {
                     this.direction = 'down';
                 }
              break;   
-        }  
-    }
-
-    foodPosition() {
-        return {
-            x: Math.round(Math.random() * (this.canvas.width / this.snakeWidth - 1)),
-            y: Math.round(Math.random() * (this.canvas.height / this.snakeHeight - 1)),
         }
     }
 }

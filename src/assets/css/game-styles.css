@@ -8,8 +8,8 @@
 }
 #game-score {
     position: absolute;
-    top: 17px;
-    left: 20px;
+    top: 3px;
+    left: 7px;
     color: rgb(255, 255, 255);
     font-size: 20px;
 }
@@ -27,7 +27,7 @@
 }
     #game-over span {
         background: #58bf58;
-        padding: 6px 12px;
+        padding: 6px 7px;
         border-radius: 16px;
         text-shadow: 1px 1px #969696;
     }
