@@ -1,10 +1,43 @@
+#game-container {
+    position: relative;
+    width: 400px;
+    font-family: tahoma;
+}
 #game-canvas {
-    background: #000;
+    background: rgb(0, 0, 0);
 }
 #game-score {
     position: absolute;
     top: 17px;
     left: 20px;
-    color: #fff;
+    color: rgb(255, 255, 255);
     font-size: 20px;
 }
+#game-over {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: rgb(255, 255, 255);
+    text-align: center;
+    padding-top: 30%;
+    display: none;
+}
+    #game-over span {
+        background: #58bf58;
+        padding: 6px 12px;
+        border-radius: 16px;
+        text-shadow: 1px 1px #969696;
+    }
+    #game-over button {
+        background: rgb(0, 102, 255);
+        color: rgb(252, 252, 252);
+        border: solid rgb(255, 255, 255) 3px;
+        border-radius: 4px;
+        padding: 6px 12px;
+        text-transform: uppercase;
+    }
+
+    

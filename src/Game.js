@@ -8,6 +8,8 @@ export default class SnakeJS {
     constructor() {
         console.log('snake game has been loaded');
         this.container = document.getElementById('game-container');
+        this.gameOverContainer = this.container.querySelector('#game-over');
+        this.gameScoreContainer = this.container.querySelector('#game-score');
         this.snakeWidth = 10;
         this.snakeHeight = 10;
         this.snake = [];
@@ -17,8 +19,7 @@ export default class SnakeJS {
             this.snakeWidth, 
             this.snakeHeight
         );
-        this.score = 0;
-
+        this.startGame();
         // set default direction
         this.direction = 'right';
         // allow user to change direction with keys
@@ -39,7 +40,11 @@ export default class SnakeJS {
 
         this.food = this.foodPosition();
 
-        setInterval(this.draw.bind(this), 60);
+        setInterval(() => {
+            if (this.running) {
+                this.draw();
+            }
+        }, 60);
     }
 
     draw() {
@@ -73,23 +78,27 @@ export default class SnakeJS {
         }
 
         // hit self
-        if (this.checkCollision(x, y)) {
-            this.scorePoiht(true);
-            console.log('Game over');
+        if (this.frames > this.snake.length) {
+            if (this.checkCollision(x, y)) {
+                this.gameOver();
+            }
         }
 
         // eats the food
         if (x === this.food.x && y === this.food.y) {
             this.food = this.foodPosition();
-            this.scorePoiht(1);
+            this.setScore();
         } else {
             this.snake.pop();
         }
 
+        // set snake to next location
         this.snake.unshift({
             x,
             y,
         });
+
+        this.frames++;
     }
 
     flipHead(x, y) {
@@ -165,10 +174,26 @@ export default class SnakeJS {
         );
     }
 
-    scorePoiht(reset) {
-        this.score = reset === true ? 0 : this.score + 1;
-        
-        document.getElementById('game-score').textContent = this.score;
+    setScore(point) {
+        this.score = point === 0 ? 0 : this.score + 1;
+        this.gameScoreContainer.textContent = this.score;
+    }
+
+    startGame() {
+        console.log('Start game');
+        this.running = true;
+        this.frames = 0;
+        this.setScore(0);
+        this.gameOverContainer.style.display = 'none';
+    }
+
+    gameOver() {
+        console.log('Game over!');
+        this.running = false;
+        this.frames = 0;
+        this.gameOverContainer.querySelector('span').textContent = this.score;
+        this.setScore(0);
+        this.gameOverContainer.style.display = 'block';
     }
 
     setDirection(keyCode) {

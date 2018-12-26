@@ -6,9 +6,15 @@
     <title>Snake JS</title>
 </head>
 <body>
-    <div id="container">
+    <div id="game-container">
+        <div id="game-over">
+            <p>Game Over, you scored <span></span>!</p>
+            <button type="button">
+                Try again
+            </button>
+        </div>
         <div id="game-score">0</div>
-        <canvas id="game-canvas" width="600" height="600"></canvas>
+        <canvas id="game-canvas"></canvas>
     </div>
 </body>
 </html>
