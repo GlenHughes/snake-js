@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-const packageJSON = require('../package.json');
 const Merge = require('webpack-merge');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CommonConfig = require('./webpack-common.js');
