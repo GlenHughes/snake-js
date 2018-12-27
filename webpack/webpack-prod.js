@@ -47,7 +47,7 @@ module.exports = Merge(CommonConfig, {
             filename: '[path].gz[query]',
             test: /\.js$|\.css$|\.html$/,
             cache: true,
-            threshold: 10240,
+            threshold: 1024,
         }),
         new MiniCssExtractPlugin({
             filename: '[name].[hash].css',
