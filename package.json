@@ -4,7 +4,15 @@
     "version": "1.0.0",
     "main": "Game.js",
     "license": "GPL-2.0",
-    "private": true,
+    "author": {
+        "name": "Glen Hughes",
+        "email": "glen.866@gmail.com",
+        "url": "https://glenhughes.me"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/GlenHughes/snake-js.git"
+    },
     "scripts": {
         "dev": "webpack-dev-server --open http://localhost:8090 --config webpack/webpack-dev.js --host 0.0.0.0",
         "build": "webpack --config webpack/webpack-prod.js --env=production --progress --profile --colors"
